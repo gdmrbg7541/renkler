@@ -293,7 +293,7 @@
   }
   @keyframes pop{0%{transform:scale(.6); opacity:.2} 60%{transform:scale(1.05); opacity:1} 100%{transform:scale(1)}}
 
-  /* --- SIFIRLANDI: MOBİL DİKEY (PORTRAIT) MOD (Telefon + Tablet) --- */
+  /* --- MOBİL DİKEY (PORTRAIT) MOD (Telefon + Tablet) --- */
   @media (orientation: portrait) {
     #game-screen {
         gap: 5px;
@@ -371,7 +371,7 @@
     }
   }
 
-  /* --- SIFIRLANDI: MOBİL YATAY (LANDSCAPE) MOD (Telefon) --- */
+  /* --- MOBİL YATAY (LANDSCAPE) MOD (Telefon) --- */
   @media (orientation: landscape) and (max-height: 500px) {
     #game-screen {
         gap: 5px;
@@ -710,7 +710,9 @@
     for(const player of ['p1', 'p2']) {
       if(choices[player]) {
         choices[player].element.classList.remove('selected');
-        choices[player].element.classList.add(choices[player].correct ? 'correct : 'wrong');
+        
+        /* --- DÜZELTME: Yazım hatası düzeltildi --- */
+        choices[player].element.classList.add(choices[player].correct ? 'correct' : 'wrong');
         
         if(choices[player].correct && choices[player].animationElement) {
           document.body.appendChild(choices[player].animationElement);
