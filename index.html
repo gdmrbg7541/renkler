@@ -113,10 +113,10 @@
   .player .star{font-size: clamp(20px, 2.5vmin, 28px);}
   .player .id{display:flex; align-items:center; gap:8px; font-weight: 700;}
 
-  /* --- ZAMAN ÇUBUĞU YAPISI (FLEXBOX + RTL UYUMLU) --- */
+  /* --- ZAMAN ÇUBUĞU DÜZELTMESİ (STANDART FLEXBOX + RTL + !important TEST) --- */
   .bottom-bar {
     width: 100%;
-    display: flex; /* Flex kullan */
+    display: flex !important; /* Test için !important */
     align-items: center;
     gap: 20px;
     padding: 10px 8px 8px;
@@ -124,24 +124,22 @@
   }
   /* Timer Dış Kapsayıcı */
   #timer-bar-outer {
-      flex: 1; /* Kalan alanı doldur */
-      min-width: 0; /* Flex içinde sıfıra düşmesini engelle - KRİTİK */
+      flex: 1 !important; /* Test için !important */
+      min-width: 0 !important; /* Test için !important - KRİTİK */
       height: 70px;
-      background: #ab2a2a;
+      background: blue !important; /* TEST RENGİ */
       border-radius: 999px;
       overflow: hidden;
-      border: 4px solid #ab2a2a;
+      border: 3px solid red !important; /* TEST KENARLIĞI */
       box-shadow: inset 0 2px 2px rgba(0,0,0,.1);
-      /* border: 3px solid lime; /* Test kenarlığı kaldırıldı */ */
   }
   /* Timer (İçi) */
   #timer-bar-inner {
       height: 100%;
       width: 100%; /* Başlangıçta dolu */
-      background: #ffffff;
+      background: yellow !important; /* TEST RENGİ */
       border-radius: 999px;
       transition: width 0.1s linear;
-      /* border: 3px solid cyan; /* Test kenarlığı kaldırıldı */ */
   }
 
   .arena{
@@ -289,14 +287,14 @@
   @media (orientation: portrait) {
     #game-screen {
         gap: 3px;
-        padding: 3px; /* Azaltıldı */
+        padding: 5px;
     }
     .arena {
       grid-template-columns: 1fr;
       grid-template-rows: auto auto auto;
-      gap: 3px; /* Azaltıldı */
-      padding-block: 2px; /* Azaltıldı */
-      padding-bottom: 5px; /* Azaltıldı */
+      gap: 5px;
+      padding-block: 2px;
+      padding-bottom: 5px;
     }
     #left-answers { grid-row: 1; }
     #question-box { grid-row: 2; }
@@ -304,7 +302,7 @@
 
     .side {
         grid-template-columns: repeat(2, 1fr);
-        gap: 3px; /* Azaltıldı */
+        gap: 3px;
         grid-auto-rows: clamp(50px, 16vw, 120px);
     }
 
@@ -325,7 +323,7 @@
     }
 
     .top-area {
-        gap: 3px; /* Azaltıldı */
+        gap: 3px;
     }
     .player {
         max-width: 49%;
@@ -341,8 +339,8 @@
     }
 
     .bottom-bar {
-        gap: 3px; /* Azaltıldı */
-        padding: 2px; /* Azaltıldı */
+        gap: 3px;
+        padding: 2px;
     }
     .back {
         width: 45px;
@@ -360,17 +358,17 @@
   @media (orientation: landscape) and (max-height: 500px) {
     #game-screen {
         gap: 2px;
-        padding: 2px 3px; /* Azaltıldı */
+        padding: 2px 3px;
     }
     .arena {
-        gap: 3px; /* Azaltıldı */
+        gap: 3px;
         padding-block: 2px;
     }
 
     .side {
         grid-template-columns: repeat(2, min(30vw, 25vh));
         grid-auto-rows: min(30vw, 25vh);
-        gap: 3px; /* Azaltıldı */
+        gap: 3px;
     }
 
     .question {
@@ -389,7 +387,7 @@
     }
 
     .top-area {
-        gap: 3px; /* Azaltıldı */
+        gap: 3px;
     }
     .player {
         padding: 2px 5px;
@@ -404,8 +402,8 @@
     }
 
     .bottom-bar {
-        gap: 3px; /* Azaltıldı */
-        padding: 2px; /* Azaltıldı */
+        gap: 3px;
+        padding: 2px;
     }
     .back {
         width: 38px;
