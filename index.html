@@ -67,7 +67,6 @@
     display:grid; place-items:center; background:#ffffffcc; border:3px solid #314445; cursor:pointer;
     box-shadow:0 8px 20px rgba(0,0,0,.08);
     font-size:32px;
-    /* --- YENİ (Flexbox için) --- */
     flex-shrink: 0; 
   }
 
@@ -114,14 +113,14 @@
   .player .star{font-size: clamp(20px, 2.5vmin, 28px);}
   .player .id{display:flex; align-items:center; gap:8px; font-weight: 700;}
 
-  /* --- ZAMAN ÇUBUĞU DÜZELTMESİ (FLEXBOX) --- */
+  /* --- ZAMAN ÇUBUĞU DÜZELTMESİ (FLEXBOX + RTL) --- */
   .bottom-bar {
     width: 100%;
     display: flex; /* Grid yerine Flex kullan */
     align-items: center;
     gap: 20px;
     padding: 10px 8px 8px;
-    direction: ltr; /* 'back' butonunu sola, timer'ı sağa zorla */
+    /* direction: ltr; KALDIRILDI */
   }
   .timer{
     position:relative;
@@ -199,6 +198,7 @@
     position: relative;
     transition: transform .2s ease-out, box-shadow .16s ease, border-color .16s ease;
   }
+  
   .ans:active{transform:translateY(1px)}
   .ans.disabled{
     pointer-events:none;
@@ -291,7 +291,7 @@
   }
   @keyframes pop{0%{transform:scale(.6); opacity:.2} 60%{transform:scale(1.05); opacity:1} 100%{transform:scale(1)}}
 
-  /* --- DİKEY MOD (TABLET + TELEFON) | BOŞLUKLAR AZALTILDI --- */
+  /* --- DİKEY MOD (TABLET + TELEFON) | MİNİMUM BOŞLUKLAR --- */
   @media (orientation: portrait) {
     #game-screen {
         gap: 3px;
@@ -300,7 +300,7 @@
     .arena {
       grid-template-columns: 1fr;
       grid-template-rows: auto auto auto;
-      gap: 5px; /* Azaltıldı */
+      gap: 5px;
       padding-bottom: 10px; 
     }
     #left-answers { grid-row: 1; }
@@ -309,7 +309,7 @@
 
     .side {
         grid-template-columns: repeat(2, 1fr);
-        gap: 5px; /* Azaltıldı */
+        gap: 5px;
         grid-auto-rows: clamp(50px, 16vw, 120px); 
     }
     
@@ -330,7 +330,7 @@
     }
 
     .top-area {
-        gap: 5px; /* Azaltıldı */
+        gap: 5px;
     }
     .player {
         max-width: 49%;
@@ -346,8 +346,8 @@
     }
     
     .bottom-bar {
-        gap: 5px; /* Azaltıldı */
-        padding: 3px; /* Azaltıldı */
+        gap: 5px;
+        padding: 3px;
     }
     .back {
         width: 45px; 
@@ -366,21 +366,21 @@
     }
   }
 
-  /* --- YATAY MOD (TELEFON) | BOŞLUKLAR AZALTILDI --- */
+  /* --- YATAY MOD (TELEFON) | MİNİMUM BOŞLUKLAR --- */
   @media (orientation: landscape) and (max-height: 500px) {
     #game-screen {
         gap: 2px;
         padding: 2px 5px;
     }
     .arena {
-        gap: 8px; /* Azaltıldı */
+        gap: 8px;
         padding-block: 2px;
     }
     
     .side {
         grid-template-columns: repeat(2, min(30vw, 25vh));
         grid-auto-rows: min(30vw, 25vh);
-        gap: 5px; /* Azaltıldı */
+        gap: 5px;
     }
     
     .question {
@@ -399,7 +399,7 @@
     }
 
     .top-area {
-        gap: 5px; /* Azaltıldı */
+        gap: 5px;
     }
     .player {
         padding: 2px 5px;
@@ -414,8 +414,8 @@
     }
     
     .bottom-bar {
-        gap: 8px; /* Azaltıldı */
-        padding: 2px 3px; /* Azaltıldı */
+        gap: 8px;
+        padding: 2px 3px;
     }
     .back {
         width: 38px; 
@@ -511,7 +511,7 @@
     { name: "أَحْمَر",   hex: "#ff3131" },
     { name: "أَسْوَد",   hex: "#000000" },
     { name: "بَنَفْسَجِيّ", hex: "#542ca3" },
-    { name: "أَصْfَر",   hex: "#ffde59" }
+    { name: "أَصْفَر",   hex: "#ffde59" } /* 'f' hatası burada düzeltilmişti */
   ];
 
   const ROUNDS = 10;
@@ -704,7 +704,7 @@
       if(choices[player]) {
         choices[player].element.classList.remove('selected');
         
-        /* JS Hatası yok (bu versiyon "başla tuşu" sorunundan önceydi) */
+        /* JS Hatası yok */
         choices[player].element.classList.add(choices[player].correct ? 'correct' : 'wrong');
         
         if(choices[player].correct && choices[player].animationElement) {
