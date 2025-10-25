@@ -113,7 +113,7 @@
   .player .star{font-size: clamp(20px, 2.5vmin, 28px);}
   .player .id{display:flex; align-items:center; gap:8px; font-weight: 700;}
 
-  /* --- ZAMAN ÇUBUĞU DÜZELTMESİ (STANDART FLEXBOX + RTL) --- */
+  /* --- ZAMAN ÇUBUĞU YAPISI (FLEXBOX + RTL UYUMLU) --- */
   .bottom-bar {
     width: 100%;
     display: flex; /* Flex kullan */
@@ -122,7 +122,7 @@
     padding: 10px 8px 8px;
     /* direction: ltr; KALDIRILDI - Doğal RTL akışı */
   }
-  /* Yeni Timer Dış Kapsayıcı */
+  /* Timer Dış Kapsayıcı */
   #timer-bar-outer {
       flex: 1; /* Kalan alanı doldur */
       min-width: 0; /* Flex içinde sıfıra düşmesini engelle - KRİTİK */
@@ -132,18 +132,16 @@
       overflow: hidden;
       border: 4px solid #ab2a2a;
       box-shadow: inset 0 2px 2px rgba(0,0,0,.1);
-      border: 3px solid lime; /* GEÇİCİ: Görünürlük testi */
+      /* border: 3px solid lime; /* Test kenarlığı kaldırıldı */ */
   }
-  /* Yeni Zaman Çubuğu (İçi) */
+  /* Timer (İçi) */
   #timer-bar-inner {
       height: 100%;
       width: 100%; /* Başlangıçta dolu */
       background: #ffffff;
       border-radius: 999px;
       transition: width 0.1s linear;
-      border: 3px solid cyan; /* GEÇİCİ: Görünürlük testi */
-      /* position: absolute kaldırıldı */
-      /* right: 0 kaldırıldı */
+      /* border: 3px solid cyan; /* Test kenarlığı kaldırıldı */ */
   }
 
   .arena{
@@ -291,13 +289,14 @@
   @media (orientation: portrait) {
     #game-screen {
         gap: 3px;
-        padding: 5px;
+        padding: 3px; /* Azaltıldı */
     }
     .arena {
       grid-template-columns: 1fr;
       grid-template-rows: auto auto auto;
-      gap: 5px;
-      padding-bottom: 10px;
+      gap: 3px; /* Azaltıldı */
+      padding-block: 2px; /* Azaltıldı */
+      padding-bottom: 5px; /* Azaltıldı */
     }
     #left-answers { grid-row: 1; }
     #question-box { grid-row: 2; }
@@ -305,7 +304,7 @@
 
     .side {
         grid-template-columns: repeat(2, 1fr);
-        gap: 5px;
+        gap: 3px; /* Azaltıldı */
         grid-auto-rows: clamp(50px, 16vw, 120px);
     }
 
@@ -326,7 +325,7 @@
     }
 
     .top-area {
-        gap: 5px;
+        gap: 3px; /* Azaltıldı */
     }
     .player {
         max-width: 49%;
@@ -342,8 +341,8 @@
     }
 
     .bottom-bar {
-        gap: 5px;
-        padding: 3px;
+        gap: 3px; /* Azaltıldı */
+        padding: 2px; /* Azaltıldı */
     }
     .back {
         width: 45px;
@@ -361,17 +360,17 @@
   @media (orientation: landscape) and (max-height: 500px) {
     #game-screen {
         gap: 2px;
-        padding: 2px 5px;
+        padding: 2px 3px; /* Azaltıldı */
     }
     .arena {
-        gap: 8px;
+        gap: 3px; /* Azaltıldı */
         padding-block: 2px;
     }
 
     .side {
         grid-template-columns: repeat(2, min(30vw, 25vh));
         grid-auto-rows: min(30vw, 25vh);
-        gap: 5px;
+        gap: 3px; /* Azaltıldı */
     }
 
     .question {
@@ -390,7 +389,7 @@
     }
 
     .top-area {
-        gap: 5px;
+        gap: 3px; /* Azaltıldı */
     }
     .player {
         padding: 2px 5px;
@@ -405,8 +404,8 @@
     }
 
     .bottom-bar {
-        gap: 8px;
-        padding: 2px 3px;
+        gap: 3px; /* Azaltıldı */
+        padding: 2px; /* Azaltıldı */
     }
     .back {
         width: 38px;
@@ -729,7 +728,9 @@
       const remainingPct = remain / durationMs;
 
       // Yeni iç çubuğun genişliğini güncelle
-      timerBarInner.style.width = (remainingPct * 100).toFixed(2) + '%';
+      if (timerBarInner) { // Güvenlik kontrolü
+        timerBarInner.style.width = (remainingPct * 100).toFixed(2) + '%';
+      }
 
       if(remain <= 0){
         cancelAnimationFrame(timerId);
@@ -746,7 +747,7 @@
   function clearTimer(){
     if(timerId){ cancelAnimationFrame(timerId); timerId=null; }
     // Yeni iç çubuğun genişliğini sıfırla
-    if (timerBarInner) { // Elementin varlığını kontrol et
+    if (timerBarInner) { // Güvenlik kontrolü
         timerBarInner.style.width = '100%';
     }
   }
