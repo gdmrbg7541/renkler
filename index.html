@@ -5,9 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>مسابقة الألوان</title>
 
-<!-- Google Fonts for Markazi Text -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://fonts.gstatic" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Markazi+Text:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
@@ -34,7 +33,12 @@
   }
 
   /* screens */
-  .screen{display:none; width:100vw; height:100vh; padding:16px}
+  .screen{
+    display:none; 
+    width:100vw; 
+    height:100vh;
+    padding:16px
+  }
   .screen.active{display:flex}
   #start-screen, #result-screen{align-items:center; justify-content:center; flex-direction:column; gap:28px}
 
@@ -63,10 +67,16 @@
     display:grid; place-items:center; background:#ffffffcc; border:3px solid #314445; cursor:pointer;
     box-shadow:0 8px 20px rgba(0,0,0,.08);
     font-size:32px;
+    /* --- YENİ (Flexbox için) --- */
+    flex-shrink: 0; 
   }
 
   /* game layout */
-  #game-screen{flex-direction:column; gap:10px; padding: 16px}
+  #game-screen{
+    flex-direction:column; 
+    gap:10px; 
+    padding: 16px;
+  }
 
   .top-area {
     display: flex;
@@ -104,14 +114,14 @@
   .player .star{font-size: clamp(20px, 2.5vmin, 28px);}
   .player .id{display:flex; align-items:center; gap:8px; font-weight: 700;}
 
+  /* --- ZAMAN ÇUBUĞU DÜZELTMESİ (FLEXBOX) --- */
   .bottom-bar {
     width: 100%;
-    display: grid;
-    grid-template-columns: auto 1fr;
+    display: flex; /* Grid yerine Flex kullan */
     align-items: center;
     gap: 20px;
     padding: 10px 8px 8px;
-    direction: ltr;
+    direction: ltr; /* 'back' butonunu sola, timer'ı sağa zorla */
   }
   .timer{
     position:relative;
@@ -119,7 +129,10 @@
     background: #ff5b58;
     border-radius:999px; border:4px solid #ab2a2a;
     overflow:hidden; box-shadow: inset 0 2px 2px rgba(0,0,0,.1);
-    width: 100%;
+    
+    /* Kalan alanı doldurması için */
+    flex: 1; 
+    min-width: 0; /* Taşmayı önle */
   }
   .timer .bar{
     position:absolute; 
@@ -131,6 +144,7 @@
     border-radius: 999px;
   }
   .timer .spark{
+    /* Yarı genişliği (30px) JS'de dinamik olarak hesaplanacak */
     position:absolute; right:-30px; top:50%; transform:translateY(-50%);
     width:60px; height:60px;
     border-radius:50%; background:#e53935; box-shadow:0 0 0 5px #fff, 0 0 20px 10px rgba(255,90,88,.6);
@@ -142,12 +156,13 @@
     flex-grow: 1;
     padding-block: 10px;
     width: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 
   .question{
-    /* MODIFIED: Increased size to fill screen better */
     width: clamp(280px, 45vmin, 600px);
-    height: clamp(280px, 55vmin, 620px);
+    aspect-ratio: 1 / 1; 
     background:#fff; border-radius:28px; border:4px solid #333; box-shadow:0 14px 32px rgba(0,0,0,.1);
     display:grid; place-items:center;
     padding:0;
@@ -166,7 +181,6 @@
 
   .side{
     display:grid;
-    /* MODIFIED: Increased size to fill screen better */
     grid-template-columns:repeat(2, clamp(130px, 25vmin, 250px));
     grid-auto-rows: clamp(130px, 25vmin, 250px);
     gap:min(20px,2.2vmin);
@@ -253,7 +267,7 @@
   }
 
   .card{
-    width:min(720px,94vw); background:#fff; border:4px solid #3e4245; border-radius:26px; padding:30px 24px; text-align:center;
+    width:min(720px,94vw); background:#fff; border:4px solid #3e4445; border-radius:26px; padding:30px 24px; text-align:center;
     box-shadow:0 18px 36px rgba(0,0,0,.1);
   }
   .cup{font-size:min(120px,14vmin); margin-bottom:10px}
@@ -277,15 +291,17 @@
   }
   @keyframes pop{0%{transform:scale(.6); opacity:.2} 60%{transform:scale(1.05); opacity:1} 100%{transform:scale(1)}}
 
-  @media (max-width: 900px) {
+  /* --- DİKEY MOD (TABLET + TELEFON) | BOŞLUKLAR AZALTILDI --- */
+  @media (orientation: portrait) {
     #game-screen {
-        gap: 5px;
-        padding: 8px;
+        gap: 3px;
+        padding: 3px; /* Azaltıldı */
     }
     .arena {
       grid-template-columns: 1fr;
       grid-template-rows: auto auto auto;
-      gap: 12px;
+      gap: 3px; /* Azaltıldı */
+      padding-bottom: 5px; /* Azaltıldı */
     }
     #left-answers { grid-row: 1; }
     #question-box { grid-row: 2; }
@@ -293,13 +309,128 @@
 
     .side {
         grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
+        gap: 3px; /* Azaltıldı */
+        grid-auto-rows: clamp(50px, 16vw, 120px); 
     }
+    
+    .question {
+        width: clamp(140px, 40vw, 300px);
+        aspect-ratio: 1/1;
+        justify-self: center; 
+        border-radius: 20px;
+    }
+
+    .q-text {
+        font-size: clamp(20px, 7vw, 50px);
+    }
+    .ans {
+        font-size: clamp(14px, 4vw, 24px);
+        padding: 5px; 
+        border-radius: 16px;
+    }
+
     .top-area {
-        gap: 10px;
+        gap: 3px; /* Azaltıldı */
     }
     .player {
         max-width: 49%;
+        padding: 6px 8px;
+        border-radius: 16px;
+    }
+    .player .chip{
+      font-size: clamp(16px, 3.5vw, 22px);
+      padding: 4px 10px;
+    }
+    .player .star {
+      font-size: clamp(16px, 3.5vw, 22px);
+    }
+    
+    .bottom-bar {
+        gap: 5px; /* Azaltıldı */
+        padding: 3px; /* Azaltıldı */
+    }
+    .back {
+        width: 45px; 
+        height: 45px; 
+        font-size: 24px;
+        border-radius: 10px;
+    }
+    .timer {
+        height: 45px; 
+    }
+    .spark {
+        width: 36px; 
+        height: 36px; 
+        border-width: 3px; 
+        box-shadow: 0 0 0 3px #fff, 0 0 12px 6px rgba(255,90,88,.6);
+    }
+  }
+
+  /* --- YATAY MOD (TELEFON) | BOŞLUKLAR AZALTILDI --- */
+  @media (orientation: landscape) and (max-height: 500px) {
+    #game-screen {
+        gap: 2px;
+        padding: 2px 3px; /* Azaltıldı */
+    }
+    .arena {
+        gap: 5px; /* Azaltıldı */
+        padding-block: 2px;
+    }
+    
+    .side {
+        grid-template-columns: repeat(2, min(30vw, 25vh));
+        grid-auto-rows: min(30vw, 25vh);
+        gap: 3px; /* Azaltıldı */
+    }
+    
+    .question {
+        width: min(40vw, 40vh);
+        aspect-ratio: 1/1;
+        border-radius: 15px;
+    }
+
+    .q-text {
+        font-size: clamp(16px, 7vh, 40px);
+    }
+    .ans {
+        font-size: clamp(12px, 4vh, 24px);
+        border-radius: 12px;
+        padding: 2px;
+    }
+
+    .top-area {
+        gap: 3px; /* Azaltıldı */
+    }
+    .player {
+        padding: 2px 5px;
+        border-radius: 10px;
+    }
+    .player .chip{
+      font-size: clamp(12px, 3vh, 18px); 
+      padding: 2px 8px;
+    }
+    .player .star {
+      font-size: clamp(12px, 3vh, 18px);
+    }
+    
+    .bottom-bar {
+        gap: 5px; /* Azaltıldı */
+        padding: 2px 3px; /* Azaltıldı */
+    }
+    .back {
+        width: 38px; 
+        height: 38px; 
+        font-size: 20px;
+        border-radius: 8px;
+    }
+    .timer {
+        height: 38px; 
+    }
+    .spark {
+        width: 30px; 
+        height: 30px; 
+        border-width: 2px; 
+        box-shadow: 0 0 0 3px #fff, 0 0 10px 5px rgba(255,90,88,.6);
     }
   }
 
@@ -307,14 +438,12 @@
 </head>
 <body>
 
-<!-- START SCREEN -->
 <section id="start-screen" class="screen active">
   <div class="logo-tile" aria-hidden="true">🎨</div>
   <div class="title">مسابقة الألوان</div>
   <button id="start-btn" class="btn">ابدأ</button>
 </section>
 
-<!-- GAME SCREEN -->
 <section id="game-screen" class="screen" aria-live="polite">
   
   <div class="top-area">
@@ -360,7 +489,6 @@
 
 </section>
 
-<!-- RESULT SCREEN -->
 <section id="result-screen" class="screen">
   <div class="card">
     <div class="cup">🏆</div>
@@ -369,7 +497,6 @@
   </div>
 </section>
 
-<!-- COUNTDOWN OVERLAY -->
 <div id="overlay" class="overlay"><div class="count" id="count"></div></div>
 
 <script>
@@ -472,6 +599,10 @@
     answered = { p1:false, p2:false };
     choices = { p1: null, p2: null };
     acceptingAnswers = true;
+    
+    // Reset arena scroll
+    const arena = document.querySelector('.arena');
+    if (arena) arena.scrollTop = 0;
 
     // pick color and type
     current = COLORS[Math.floor(Math.random()*COLORS.length)];
@@ -604,13 +735,19 @@
   // Timer logic
   function startTimer(durationMs, onEnd){
     const start = performance.now();
+    
+    /* (Değişiklik yok) Dinamik offset */
+    const sparkOffset = spark.offsetWidth / 2;
+
     function frame(now){
       const elapsed = now - start;
       const remain = Math.max(0, durationMs - elapsed);
       const remainingPct = remain / durationMs;
 
       timeBar.style.width = (remainingPct * 100).toFixed(2) + '%';
-      spark.style.right = `calc(${(remainingPct * 100).toFixed(2)}% - 30px)`;
+      
+      /* (Değişiklik yok) Dinamik offset */
+      spark.style.right = `calc(${(remainingPct * 100).toFixed(2)}% - ${sparkOffset}px)`;
 
       if(remain <= 0){
         cancelAnimationFrame(timerId);
@@ -627,7 +764,10 @@
   function clearTimer(){
     if(timerId){ cancelAnimationFrame(timerId); timerId=null; }
     timeBar.style.width = '100%';
-    spark.style.right = 'calc(100% - 30px)';
+    
+    /* (Değişiklik yok) Dinamik offset */
+    const sparkOffset = spark.offsetWidth / 2;
+    spark.style.right = `calc(100% - ${sparkOffset}px)`;
   }
 
   function advanceAfterTimeout(){
@@ -663,6 +803,8 @@
     startCountdownThenGame();
   });
 
+
+
   document.getElementById('play-again').addEventListener('click', ()=>{
     show('game');
     startCountdownThenGame();
@@ -682,4 +824,3 @@
 </script>
 </body>
 </html>
-
