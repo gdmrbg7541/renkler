@@ -1,624 +1,389 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="tr">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>مسابقة الألوان</title>
-
-<!-- Google Fonts for Markazi Text -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Markazi+Text:wght@400;500;600;700&display=swap" rel="stylesheet">
-
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Arapça Renk Oyunu</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Harmattan:wght@400;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Marhey:wght@400;700&display=swap" rel="stylesheet"/>
 <style>
-  :root{
-    --bg-1:#f5f2ea;
-    --bg-2:#e6e2d9;
-    --ink:#0e1c1c;
-    --pill:#0e3a3a;
-    --pillText:#e8f0ef;
-    --chip:#e9e4da;
+        html { font-size: clamp(12px, 1.2vw, 16px); }
 
-    --ok:#28a745;
-    --no:#e74c3c;
-  }
+        :root {
+            --bg-start: #f7f9fc; --bg-end: #e8eef5; --primary-color: #5E81AC; --accent-color: #f7b733; --surface-color: #FFFFFF; --text-color: #2e3440; --text-light-color: #FFFFFF; --player1-color: #64a7fa; --player2-color: #f77d7d; --correct-color: #2ddc73; --incorrect-color: #f24c4c; --shadow-light: rgba(46, 52, 64, 0.07); --shadow-medium: rgba(46, 52, 64, 0.12); --border-radius-sm: 8px; --border-radius-md: 12px; --border-radius-lg: 16px;
+            --button-bg: var(--surface-color); --button-shadow: 0 3px #d8dee9; --button-hover-bg: #eceff4; --button-selected-bg: var(--primary-color); --button-selected-color: var(--text-light-color); --button-selected-shadow: 0 0 0 3px var(--accent-color);
+        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-  *{box-sizing:border-box}
-  html,body{height:100%;margin:0; overflow:hidden;}
-  body{
-    font-family: 'Markazi Text', serif;
-    color:var(--ink);
-    background: radial-gradient(1200px 700px at 50% 20%, var(--bg-1), var(--bg-2));
-    user-select:none;
-  }
+        html, body { width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden; }
 
-  /* screens */
-  .screen{display:none; width:100vw; height:100vh; padding:12px}
-  .screen.active{display:flex}
-  #start-screen, #result-screen{align-items:center; justify-content:center; flex-direction:column; gap:20px}
+        body { font-family: 'Marhey', sans-serif; background-color: var(--bg-start); background-image: linear-gradient(180deg, var(--bg-start) 0%, var(--bg-end) 100%); color: var(--text-color); text-align: center; text-rendering: optimizeLegibility; }
+        button, input, select { font-family: inherit; }
 
-  /* logo + title */
-  .logo-tile{
-    width:min(150px,20vmin); height:min(150px,20vmin);
-    border-radius:20px; display:grid; place-items:center;
-    background:#ffffffdd; border:3px solid #3c4747; box-shadow:0 10px 24px rgba(20,20,20,.08);
-    font-size:min(72px,9vmin);
-  }
-  .title{ font-size:min(48px,7vmin); font-weight:700; letter-spacing:.5px; text-shadow:0 6px 18px rgba(0,0,0,.08); }
-  .btn{
-    cursor:pointer; border:none; outline:none;
-    padding:12px 22px; font-size:24px; border-radius:16px;
-    background:linear-gradient(180deg,#bfe0f3,#9dc3da);
-    color:#0b1e25; border:3px solid #515b5f; box-shadow:0 10px 24px rgba(0,0,0,.08);
-  }
-  .btn:active{transform:translateY(1px)}
+        #game-wrapper { width: 100%; height: 100%; position: relative; }
 
-  .back{
-    width:46px; height:46px; border-radius:12px;
-    display:grid; place-items:center; background:#ffffffcc; border:3px solid #314445; cursor:pointer;
-    box-shadow:0 8px 20px rgba(0,0,0,.08);
-    font-size:26px;
-  }
+        .screen { display: none; width: 100%; height: 100%; flex-direction: column; align-items: center; position: absolute; top: 0; left: 0; transition: opacity 0.5s; overflow-y: auto; padding: 20px; }
+        .screen.active { display: flex; }
 
-  /* game layout */
-  #game-screen{
-    flex-direction:column; gap:8px; padding:12px;
-    /* alttaki sabit zaman çizgisi ile çakışmayı önlemek için boşluk */
-    padding-bottom:max(12px,76px);
-  }
+        /* --- Başlangıç Ekranı --- */
+        #start-screen { gap: 25px; justify-content: center; }
+        .start-title { font-size: clamp(2.2rem, 5vw, 3rem); color: var(--text-color); margin-bottom: 10px; }
+        .start-options { display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 400px; }
+        .option-group { display: flex; flex-direction: column; align-items: stretch; gap: 10px; }
+        .option-group label { font-size: 1.2rem; font-weight: bold; color: var(--primary-color); margin-bottom: 5px; text-align: left; }
+        .player-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .player-button, #start-game-btn { background-color: var(--button-bg); border: none; border-radius: var(--border-radius-md); padding: 12px 15px; font-size: 1.2rem; font-weight: 500; color: var(--text-color); cursor: pointer; transition: all 0.2s ease; box-shadow: var(--button-shadow); text-align: center; }
 
-  .top-area {
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    width:100%;
-    gap:8px;
-    flex-wrap:wrap;
-  }
+        .player-button:hover {
+            background-color: var(--button-hover-bg);
+            transform: translateY(-1px);
+            box-shadow: 0 4px #cdd3db;
+        }
+        .player-button:active, #start-game-btn:not(:disabled):active { transform: translateY(1px); box-shadow: 0 2px #d8dee9; }
+        .player-button.selected { background-color: var(--button-selected-bg); color: var(--text-light-color); font-weight: bold; box-shadow: var(--button-selected-shadow); transform: none; }
 
-  .player{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    font-size:clamp(16px,2.4vmin,24px);
-    background:var(--chip);
-    color:var(--ink);
-    padding:8px 12px;
-    border-radius:16px;
-    border:2px solid #bcaea1;
-    box-shadow:0 4px 10px rgba(0,0,0,0.06);
-    flex:1 1 0;
-    min-width:220px;
-    max-width:49%;
-  }
-  .player-id-group, .player-score-group { display:flex; align-items:center; gap:8px; }
-  .player .chip{
-    background:var(--pill); color:var(--pillText); padding:6px 12px; border-radius:999px; border:2px solid #0b2b2b;
-    min-width:42px; text-align:center; font-weight:700; font-size:clamp(16px,2.2vmin,22px);
-  }
-  .player .star{font-size:clamp(16px,2.2vmin,22px);}
-  .player .id{display:flex; align-items:center; gap:6px; font-weight:700;}
+        #start-game-btn { margin-top: 15px; font-size: 1.4rem; font-weight: bold; }
+        #start-game-btn:disabled { background-color: #bdc3c7; color: #7f8c8d; opacity: 0.7; box-shadow: none; cursor: not-allowed; transform: none; }
+        #start-game-btn:not(:disabled) {
+            background-color: var(--correct-color);
+            color: white;
+            animation: button-glow 1.5s infinite ease-in-out;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(45, 220, 115, 0.4);
+            transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+        }
 
-  .arena{
-    display:grid;
-    grid-template-columns:1fr auto 1fr;
-    gap:min(12px,1.2vmin);
-    align-items:center;
-    flex-grow:1;
-    width:100%;
-  }
+        #start-game-btn:not(:disabled):hover { background-color: #28b863; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(45, 220, 115, 0.5); animation: none; }
+        #start-game-btn:not(:disabled):active { background-color: #23a358; transform: translateY(1px); box-shadow: 0 2px 10px rgba(45, 220, 115, 0.4); animation: none; }
 
-  /* soru kutusu KÜÇÜLTÜLDÜ */
-  .question{
-    width:clamp(200px,34vmin,440px);
-    height:clamp(200px,38vmin,480px);
-    background:#fff; border-radius:22px; border:3px solid #333; box-shadow:0 10px 24px rgba(0,0,0,.08);
-    display:grid; place-items:center;
-    padding:0; overflow:hidden;
-  }
-  .q-text{
-    font-size:clamp(28px,9vmin,56px);
-    font-weight:700; text-align:center; line-height:1.15; padding:8px;
-  }
-  .q-color{ width:100%; height:100%; }
+        /* --- Oyun Ekranı --- */
+        #quiz-screen { padding: 15px; gap: 15px; justify-content: flex-start; }
+        #quiz-screen.single-player-mode { justify-content: center; }
+        #results-screen { justify-content: center; }
 
-  /* şıklar KÜÇÜLTÜLDÜ + boşluklar azaltıldı */
-  .side{
-    display:grid;
-    grid-template-columns:repeat(2, minmax(100px, 1fr));
-    grid-auto-rows:minmax(100px, 1fr);
-    gap:8px;
-    justify-content:center;
-    align-content:center;
-  }
-  .ans{
-    border-radius:18px; border:3px solid rgba(0,0,0,.6); background:#fff;
-    display:grid; place-items:center;
-    font-family:'Markazi Text', serif;
-    font-size:clamp(18px,4.2vmin,32px);
-    font-weight:700; text-align:center;
-    padding:8px;
-    cursor:pointer;
-    box-shadow:0 6px 14px rgba(0,0,0,.06);
-    position:relative;
-    transition:transform .18s ease-out, box-shadow .14s ease, border-color .14s ease;
-  }
-  .ans:active{transform:translateY(1px)}
-  .ans.disabled{pointer-events:none;}
-  .ans.selected{transform:scale(0.95); box-shadow:0 0 0 3px #4a90e2;}
-  .ans.color{border:none}
-  .ans.correct{ border-color:var(--ok)!important; box-shadow:0 0 0 4px var(--ok); transform:scale(1.06); }
-  .ans.wrong{ border-color:var(--no)!important; box-shadow:0 0 0 4px var(--no); animation:shake .45s ease-in-out; }
+        .header-navigation { position: absolute; top: 10px; left: 10px; z-index: 200; }
+        .back-btn { background: none; border: none; cursor: pointer; padding: 5px; }
+        .back-btn svg { width: 35px; height: 35px; fill: var(--text-color); transition: all 0.2s; opacity: 0.8; filter: drop-shadow(0 1px 2px var(--shadow-light)); }
+        .back-btn:hover svg { opacity: 1; transform: scale(1.1); }
+        .hidden { display: none !important; }
 
-  .ans.correct::after, .ans.wrong::after {
-    font-family:system-ui,sans-serif; position:absolute; top:6px; right:10px;
-    font-size:34px; font-weight:bold; color:white;
-  }
-  .ans.correct::after { content:'✔'; text-shadow:0 0 6px var(--ok), 0 0 4px var(--ok); }
-  .ans.wrong::after   { content:'✖'; text-shadow:0 0 6px var(--no), 0 0 4px var(--no); }
+        #quiz-container { display: flex; flex-direction: row; gap: 15px; width: 100%; height: 100%; max-width: 1500px; position: relative; }
+        #quiz-container::after { content: ''; position: absolute; top: 5%; bottom: 5%; left: 50%; transform: translateX(-50%); width: 2px; background-color: rgba(0,0,0,0.08); border-radius: 2px; }
 
-  @keyframes shake {
-    10%, 90% { transform: translateX(-2px) scale(0.95); }
-    20%, 80% { transform: translateX(4px) scale(0.95); }
-    30%, 50%, 70% { transform: translateX(-5px) scale(0.95); }
-    40%, 60% { transform: translateX(5px) scale(0.95); }
-  }
+        #quiz-screen.single-player-mode #quiz-container { flex-direction: column; max-width: 700px; height: auto; }
+        #quiz-screen.single-player-mode #quiz-container::after { display: none; }
+        #quiz-screen.single-player-mode .quiz-player-area.p2 { display: none; }
+        #quiz-screen.single-player-mode .quiz-player-area.p1 { width: 100%; min-height: unset; }
 
-  .point-animation{
-    position:fixed; z-index:100; font-size:40px; font-weight:bold; color:#ffc107;
-    text-shadow:0 0 5px black; pointer-events:none; animation:fly-up 1.2s ease-out forwards;
-  }
-  @keyframes fly-up{
-    0%{transform:translate(-50%,-50%) scale(0.5); opacity:1;}
-    100%{transform:translate(-50%,-220%) scale(1.1); opacity:0;}
-  }
+        .countdown-overlay {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(46, 52, 64, 0.75); backdrop-filter: blur(4px); z-index: 200;
+            display: none; justify-content: center; align-items: center;
+            font-size: clamp(10rem, 35vw, 20rem); font-weight: bold; color: var(--accent-color); text-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
 
-  .card{
-    width:min(620px,94vw); background:#fff; border:3px solid #3e4245; border-radius:22px; padding:24px 18px; text-align:center;
-    box-shadow:0 16px 32px rgba(0,0,0,.08);
-  }
-  .cup{font-size:min(100px,12vmin); margin-bottom:8px}
-  .rank{display:grid; gap:12px; margin:12px auto 6px}
-  .row{ display:flex; align-items:center; justify-content:center; gap:10px; }
-  .row .player-pill{
-    background:var(--pill); color:var(--pillText); border:3px solid #0b2b2b; border-radius:999px; padding:6px 12px; display:flex; align-items:center; gap:8px;
-  }
-  .row .score-chip{background:var(--chip); color:#1d2a2a; padding:2px 10px; border-radius:999px; border:2px solid #4f5a5a; min-width:50px; font-weight:700}
-  .again{margin-top:16px}
+        .quiz-player-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 15px; gap: 15px; border-radius: var(--border-radius-lg); transition: transform 0.5s, box-shadow 0.5s; position: relative; min-height: 400px; }
+        .score-effects-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 100; overflow: hidden; border-radius: var(--border-radius-lg); }
+        .score-effect { position: absolute; top: 50%; left: 50%; transform: translateX(-50%); font-size: 3.5rem; font-weight: bold; color: var(--text-light-color); text-shadow: 2px 2px 4px rgba(0,0,0,0.5); padding: 5px 15px; border-radius: var(--border-radius-sm); display: flex; align-items: center; gap: 10px; animation: float-up-and-fade 2s ease-out forwards; }
+        .score-effect.bonus { z-index: 101; }
+        .burst-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        .particle { position: absolute; top: 50%; left: 50%; width: 10px; height: 10px; margin-top: -5px; margin-left: -5px; background-color: var(--accent-color); border-radius: 50%; opacity: 0; animation: burst 1.2s ease-out; }
+        @keyframes burst { 0% { transform: rotate(var(--angle)) translateY(20px) scale(1); opacity: 1; } 100% { transform: rotate(var(--angle)) translateY(120px) scale(0); opacity: 0; } }
+        .score-effect svg { width: 32px; height: 32px; fill: white; filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.5)); }
+        @keyframes float-up-and-fade { 0% { transform: translate(-50%, 0); opacity: 1; } 100% { transform: translate(-50%, -300px); opacity: 0; } }
+        .quiz-player-area.shake { animation: shake 0.5s; }
 
-  .overlay{
-    position:fixed; inset:0; background:rgba(240,239,235,.92); display:none; align-items:center; justify-content:center; z-index:9;
-  }
-  .overlay.active{display:flex}
-  .count{
-    font-size:min(160px,22vmin); font-weight:800; text-shadow:0 16px 32px rgba(0,0,0,.12); animation:pop .6s ease both;
-  }
-  @keyframes pop{0%{transform:scale(.6); opacity:.2} 60%{transform:scale(1.05); opacity:1} 100%{transform:scale(1)}}
+        .quiz-top-bar { display: flex; width: 100%; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 10px; padding: 0 5px; flex-shrink: 0; }
+        .quiz-game-content { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 15px; width: 100%; flex-grow: 1; }
+        .quiz-player-area .quiz-progress { font-size: 1.6rem; color: var(--text-color); font-weight: bold; display: flex; align-items: center; flex-shrink: 0; }
+        .quiz-score-display { display: flex; align-items: center; gap: 8px; }
+        .quiz-score-display svg { width: 28px; height: 28px; fill: var(--accent-color); }
+        .quiz-player-area .progress-bar { flex-grow: 1; margin: 0; flex-direction: row-reverse; display: flex; gap: 4px; height: 10px; flex-shrink: 1; width: auto; }
+        .progress-segment { flex: 1; background-color: #e5e9f0; border-radius: 5px; transition: all 0.3s ease; }
+        .progress-segment.correct { background-color: var(--correct-color); }
+        .progress-segment.incorrect { background-color: var(--incorrect-color); }
+        .progress-segment.active { background-color: var(--accent-color); transform: scaleY(1.5); }
 
-  /* === SABİT ALT ZAMAN ÇİZGİSİ (KUTU DIŞINDA) === */
-  .bottom-bar{
-    position:fixed;
-    bottom:max(8px, env(safe-area-inset-bottom));
-    left:0; right:0; width:100%;
-    display:flex; align-items:center; gap:8px;
-    padding:0 8px;
-    direction:ltr;
-    z-index:20;
-    pointer-events:none;
-  }
-  .bottom-bar > * { pointer-events:auto; }
+        .quiz-player-area .quiz-question {
+            font-size: clamp(2.5rem, 10cqw, 4rem); font-weight: bold; padding: 15px; background-color: var(--surface-color); border-radius: var(--border-radius-md);
+            min-height: 120px; display: block; white-space: normal; overflow: hidden; text-overflow: ellipsis; line-height: 1.3; text-align: center; width: 100%;
+            box-shadow: 0 4px 15px var(--shadow-light); margin-bottom: 15px; direction: rtl; container-type: inline-size; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .quiz-player-area .quiz-question.color-question { border: 2px solid #e0e0e0; }
+        
+        .quiz-player-area .quiz-options { display: grid; grid-template-columns: 1fr; gap: 10px; width: 100%; flex-grow: 1; }
+        .quiz-options.four-options { grid-template-columns: 1fr 1fr; }
 
-  .timer{
-    position:relative;
-    flex-grow:1; height:42px;
-    background:#ff5b58;
-    border-radius:999px; border:3px solid #ab2a2a;
-    overflow:hidden; box-shadow:inset 0 2px 2px rgba(0,0,0,.1);
-    width:100%;
-  }
-  .timer .bar{
-    position:absolute; right:0; top:0; bottom:0; width:100%;
-    background:#ffffff; border-radius:999px;
-  }
-  .timer .spark{
-    position:absolute; right:-26px; top:50%; transform:translateY(-50%);
-    width:52px; height:52px; border-radius:50%; background:#e53935;
-    box-shadow:0 0 0 4px #fff, 0 0 16px 8px rgba(255,90,88,.55);
-    border:3px solid #ab2a2a;
-  }
+        .quiz-player-area .quiz-option-btn {
+            position: relative; 
+            font-family: inherit; border: 2px solid; color: var(--text-color);
+            font-size: clamp(1.2rem, 3vw, 1.8rem); font-weight: bold; padding: 12px; border-radius: var(--border-radius-md);
+            cursor: pointer; transition: all 0.2s ease-in-out; box-shadow: 0 2px 8px var(--shadow-light);
+            min-height: 50px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center;
+            direction: rtl; 
+        }
+        .quiz-player-area .quiz-option-btn.color-swatch { font-size: 0; text-indent: -9999px; min-height: 70px; border-width: 3px; }
+        .quiz-player-area .quiz-option-btn.color-swatch.white-swatch { border-color: #ccc; }
 
-  /* MOBİL SIKILAŞTIRMA */
-  @media (max-width:900px){
-    #game-screen{ gap:6px; padding:8px; padding-bottom:max(10px,72px); }
+        .quiz-option-btn.selected { transform: scale(1.02); }
+        .p1 .quiz-option-btn.selected { border-color: var(--player1-color); box-shadow: 0 4px 10px rgba(100, 167, 250, 0.4); }
+        .p2 .quiz-option-btn.selected { border-color: var(--player2-color); box-shadow: 0 4px 10px rgba(247, 125, 125, 0.4); }
+        
+        .quiz-option-btn:disabled { cursor: not-allowed; opacity: 0.7; }
 
-    .arena{
-      grid-template-columns:1fr;
-      grid-template-rows:auto auto auto;
-      gap:8px;
-    }
-    #left-answers{ grid-row:1; }
-    #question-box{ grid-row:2; }
-    #right-answers{ grid-row:3; }
+        .quiz-player-area.p1 { background-color: rgba(100, 167, 250, 0.1); }
+        .quiz-player-area.p1 .quiz-option-btn { background-color: #f0f6ff; border-color: #d1e3ff; }
+        .quiz-player-area.p1 .quiz-option-btn:hover:not(:disabled) { background-color: #e2eeff; border-color: var(--player1-color); transform: translateY(-2px); }
+        .quiz-player-area.p2 { background-color: rgba(247, 125, 125, 0.1); }
+        .quiz-player-area.p2 .quiz-option-btn { background-color: #fff0f0; border-color: #ffd6d6; }
+        .quiz-player-area.p2 .quiz-option-btn:hover:not(:disabled) { background-color: #ffe4e4; border-color: var(--player2-color); transform: translateY(-2px); }
 
-    .side{
-      grid-template-columns:repeat(2, minmax(88px, 1fr));
-      grid-auto-rows:minmax(88px, 1fr);
-      gap:6px;
-    }
-    .question{
-      width:clamp(180px, 46vw, 380px);
-      height:clamp(180px, 48vw, 420px);
-    }
-    .q-text{ font-size:clamp(24px,8.5vmin,48px); }
-    .ans{ font-size:clamp(16px,4.2vmin,28px); padding:6px; border-width:3px; }
-    .top-area{ gap:6px; }
-    .player{ padding:6px 10px; border-width:2px; }
-    .bottom-bar{ bottom:max(6px, env(safe-area-inset-bottom)); padding:0 6px; gap:6px; }
-    .timer{ height:38px; }
-    .back{ width:42px; height:42px; font-size:24px; }
-  }
+        .feedback-icon {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(0); 
+            width: clamp(30px, 8vw, 50px); height: clamp(30px, 8vw, 50px);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            pointer-events: none; opacity: 0;
+            animation: scale-in-fade-out 1.4s ease-out forwards; 
+        }
+        .feedback-icon svg { width: 60%; height: 60%; fill: white; }
+        .feedback-icon.tick-icon { background-color: var(--correct-color); box-shadow: 0 0 15px rgba(45, 220, 115, 0.6); }
+        .feedback-icon.cross-icon { background-color: var(--incorrect-color); box-shadow: 0 0 15px rgba(242, 76, 76, 0.6); animation-name: scale-in-fade-out, shake-icon; animation-duration: 1.4s, 0.4s; animation-delay: 0s, 0s; animation-timing-function: ease-out, linear; animation-iteration-count: 1, 1; }
 
-  /* ULTRA DAR EKRANLAR (<= 360px genişlik) */
-  @media (max-width:360px){
-    .side{ grid-template-columns:repeat(2, minmax(80px,1fr)); grid-auto-rows:minmax(80px,1fr); gap:5px; }
-    .question{ width:72vw; height:72vw; }
-    .timer{ height:34px; }
-  }
+        @keyframes scale-in-fade-out { 0% { transform: translate(-50%, -50%) scale(0); opacity: 0; } 20% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; } 40% { transform: translate(-50%, -50%) scale(1); opacity: 1; } 80% { transform: translate(-50%, -50%) scale(1); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; } }
+        @keyframes shake-icon { 10%, 90% { transform: translate(-51%, -50%) rotate(-1deg) scale(1); } 20%, 80% { transform: translate(-49%, -50%) rotate(1deg) scale(1); } 30%, 50%, 70% { transform: translate(-52%, -50%) rotate(-2deg) scale(1); } 40%, 60% { transform: translate(-48%, -50%) rotate(2deg) scale(1); } 100% { transform: translate(-50%, -50%) rotate(0deg) scale(0.8); } } /* scale eklendi */
+
+        .game-over-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: var(--surface-color); padding: 30px 50px; border-radius: var(--border-radius-lg); border: none; z-index: 200; display: flex; flex-direction: column; align-items: center; gap: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+
+        #results-screen h2 { font-size: clamp(2.5rem, 6vw, 4rem); margin-bottom: 15px; margin-top: 0; }
+        #results-screen h3 { font-size: clamp(2rem, 5vw, 3rem); margin: 10px 0; }
+        #results-screen p { font-size: clamp(1.2rem, 3vw, 1.8rem); margin: 10px 0; color: var(--primary-color); }
+        .unlocked-message { font-size: clamp(1.8rem, 5vw, 2.8rem) !important; font-weight: bold; color: var(--correct-color) !important; animation: button-glow 1.5s infinite ease-in-out; text-shadow: 0 0 10px rgba(45, 220, 115, 0.5); margin-top: 10px !important; }
+
+        #quiz-winner-icon-container { display: flex; justify-content: center; gap: 10px; }
+        #quiz-winner-icon-container svg { width: clamp(50px, 10vw, 80px); height: clamp(50px, 10vw, 80px); }
+        #quiz-win-text.p1-win { color: var(--player1-color); } #quiz-winner-icon-container.p1-win svg { fill: var(--player1-color); }
+        #quiz-win-text.p2-win { color: var(--player2-color); } #quiz-winner-icon-container.p2-win svg { fill: var(--player2-color); }
+        #quiz-win-text.draw { color: var(--accent-color); } #quiz-winner-icon-container.draw svg { width: clamp(40px, 8vw, 60px); height: clamp(40px, 8vw, 60px); } #quiz-winner-icon-container.draw svg:first-child { fill: var(--player1-color); } #quiz-winner-icon-container.draw svg:last-child { fill: var(--player2-color); }
+
+        .win-buttons { display: flex; gap: 30px; margin-top: 15px; }
+        .win-buttons .icon-btn { background:transparent; border:none; cursor:pointer; transition:all .3s ease; padding:5px; }
+        .win-buttons .icon-btn:hover { transform: scale(1.1); }
+        .win-buttons .icon-btn svg { width: clamp(40px, 8vw, 56px); height: clamp(40px, 8vw, 56px); fill: var(--primary-color); }
+        .win-buttons .icon-btn:hover svg { fill: var(--accent-color); }
+
+        @keyframes pulse-start { 0%, 100% { transform: scale(1); box-shadow: 0 4px 15px var(--shadow-light); opacity: 0.95; } 50% { transform: scale(1.03); box-shadow: 0 6px 20px rgba(45, 220, 115, 0.3); opacity: 1; } }
+        @keyframes button-glow { 0%, 100% { box-shadow: 0 0 8px rgba(45, 220, 115, 0.5); } 50% { box-shadow: 0 0 20px rgba(45, 220, 115, 0.8); } }
+        @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
+
+        @media (max-width: 1000px) { #quiz-container { flex-direction: column; gap: 10px; height: auto; } #quiz-container::after { display: none; } .quiz-player-area { min-height: unset; } }
+         @media (max-width: 600px) { .start-title { font-size: 2.2rem; } .option-group label { font-size: 1.3rem; } .player-button { font-size: 1.2rem; padding: 12px 14px;} #start-game-btn { font-size: 1.4rem; padding: 12px 20px;} #quiz-screen { padding: 10px; gap: 10px;} .quiz-player-area { padding: 10px;} .quiz-player-area .quiz-question { font-size: 2.5rem; min-height: 80px; padding: 10px;} .quiz-player-area .quiz-option-btn { font-size: 1.4rem; padding: 12px; min-height: 50px;} .quiz-player-area .quiz-option-btn.color-swatch { min-height: 60px; } .feedback-icon { width: 30px; height: 30px; } .game-over-overlay { padding: 20px; width: 90%; } }
+
+        html, body { font-family: 'Marhey', sans-serif !important; }
+        .quiz-question, .quiz-option-btn { font-family: 'Harmattan', sans-serif !important; } 
+        button, input, select, .start-title, h2, h3, label, .quiz-progress, p { font-family: 'Marhey', sans-serif !important; }
+
 </style>
 </head>
 <body>
-
-<!-- START SCREEN -->
-<section id="start-screen" class="screen active">
-  <div class="logo-tile" aria-hidden="true">🎨</div>
-  <div class="title">مسابقة الألوان</div>
-  <button id="start-btn" class="btn">ابدأ</button>
-</section>
-
-<!-- GAME SCREEN -->
-<section id="game-screen" class="screen" aria-live="polite">
-  <div class="top-area">
-    <div class="player" id="p1">
-      <div class="player-score-group">
-        <span class="chip" id="p1-score">0</span>
-        <span class="star" aria-hidden="true">⭐</span>
-      </div>
-      <div class="player-id-group">
-        <span class="id"><span aria-hidden="true">👤</span> <span class="num">1</span></span>
-      </div>
+<div id="game-wrapper">
+    <div class="screen active" id="start-screen">
+        <h1 class="start-title">Arapça Renk Oyunu</h1>
+        <div class="start-options">
+            <div class="option-group">
+                <label for="player-select">Oyuncu Sayısı:</label>
+                <div class="player-buttons" id="player-select">
+                    <button class="player-button" data-players="1">Tek Kişilik</button>
+                    <button class="player-button" data-players="2">İki Kişilik</button>
+                </div>
+            </div>
+            <button disabled id="start-game-btn">Başla</button>
+        </div>
     </div>
-
-    <div class="player" id="p2">
-      <div class="player-score-group">
-        <span class="chip" id="p2-score">0</span>
-        <span class="star" aria-hidden="true">⭐</span>
-      </div>
-      <div class="player-id-group">
-        <span class="id"><span aria-hidden="true">👤</span> <span class="num">2</span></span>
-      </div>
-    </div>
-  </div>
-
-  <div class="arena">
-    <div class="side" id="left-answers"></div>
-
-    <div class="question" id="question-box">
-      <div class="q-text" id="q-text" style="display:none"></div>
-      <div class="q-color" id="q-color" style="display:none"></div>
-    </div>
-
-    <div class="side" id="right-answers"></div>
-  </div>
-
-  <!-- SABİT ALT BAR (KUTU DIŞINDA) -->
-  <div class="bottom-bar">
-    <div class="back" id="back-home" title="عودة">←</div>
-    <div class="timer" aria-label="مؤقّت">
-      <div class="bar" id="time-bar"></div>
-      <div class="spark" id="spark"></div>
-    </div>
-  </div>
-</section>
-
-<!-- RESULT SCREEN -->
-<section id="result-screen" class="screen">
-  <div class="card">
-    <div class="cup">🏆</div>
-    <div class="rank" id="rank"></div>
-    <button id="play-again" class="btn again">إعادة اللعبة</button>
-  </div>
-</section>
-
-<!-- COUNTDOWN OVERLAY -->
-<div id="overlay" class="overlay"><div class="count" id="count"></div></div>
+    <div class="screen" id="quiz-screen"></div>
+    <div class="screen results-screen" id="results-screen"></div>
+</div>
 
 <script>
-  // ----- Data -----
-  const COLORS = [
-    { name: "أَزْرَق",   hex: "#38b6ff" },
-    { name: "بُرْتُقَالِيّ", hex: "#ff751f" },
-    { name: "وَرْدِيّ",  hex: "#ff66c4" },
-    { name: "بُنِّيّ",   hex: "#734500" },
-    { name: "أَخْضَر",   hex: "#00bf63" },
-    { name: "أَبْيَض",   hex: "#ffffff" },
-    { name: "أَحْمَر",   hex: "#ff3131" },
-    { name: "أَسْوَد",   hex: "#000000" },
-    { name: "بَنَفْسَجِيّ", hex: "#542ca3" },
-    { name: "أَصْفَر",   hex: "#ffde59" }
-  ];
+    document.addEventListener('DOMContentLoaded', () => {
 
-  const ROUNDS = 10;
-  const QUESTION_TIME = 10 * 1000;
-
-  // ----- Elements -----
-  const screens = {
-    start: document.getElementById('start-screen'),
-    game: document.getElementById('game-screen'),
-    result: document.getElementById('result-screen'),
-  };
-
-  const p1ScoreEl = document.getElementById('p1-score');
-  const p2ScoreEl = document.getElementById('p2-score');
-  const leftAnswers  = document.getElementById('left-answers');
-  const rightAnswers = document.getElementById('right-answers');
-  const questionBox = document.getElementById('question-box');
-  const qText  = document.getElementById('q-text');
-  const qColor = document.getElementById('q-color');
-  const timeBar = document.getElementById('time-bar');
-  const spark   = document.getElementById('spark');
-  const overlay = document.getElementById('overlay');
-  const countEl = document.getElementById('count');
-  const rankBox = document.getElementById('rank');
-
-  // ----- State -----
-  let scores, roundIndex, timerId;
-  let current, type;
-  let firstCorrectBy = null;
-  let answered = { p1:false, p2:false };
-  let choices = { p1: null, p2: null };
-  let acceptingAnswers = false;
-
-  function shuffle(arr){ return [...arr].sort(()=>Math.random()-0.5); }
-
-  function toArabicIndic(numString){
-    const map = {'0':'٠','1':'١','2':'٢','3':'٣','4':'٤','5':'٥','6':'٦','7':'٧','8':'٨','9':'٩'};
-    return String(numString).replace(/[0-9]/g, d => map[d]);
-  }
-
-  function show(screen){
-    Object.values(screens).forEach(s=>s.classList.remove('active'));
-    screens[screen].classList.add('active');
-  }
-
-  function startCountdownThenGame(){
-    overlay.classList.add('active');
-    const seq = [3,2,1];
-    let i=0;
-    const tick = ()=>{
-      if(i >= seq.length){
-        overlay.classList.remove('active');
-        beginGame();
-        return;
-      }
-      countEl.textContent = toArabicIndic(seq[i]);
-      countEl.classList.remove('pop'); void countEl.offsetWidth;
-      countEl.classList.add('pop');
-      i++;
-      setTimeout(tick, 800);
-    };
-    tick();
-  }
-
-  function beginGame(){
-    scores = { p1:0, p2:0 };
-    p1ScoreEl.textContent = scores.p1;
-    p2ScoreEl.textContent = scores.p2;
-    roundIndex = 0;
-    nextRound();
-  }
-
-  function nextRound(){
-    clearTimer();
-    if(roundIndex >= ROUNDS){ return finishGame(); }
-
-    firstCorrectBy = null;
-    answered = { p1:false, p2:false };
-    choices = { p1: null, p2: null };
-    acceptingAnswers = true;
-
-    current = COLORS[Math.floor(Math.random()*COLORS.length)];
-    type = Math.random() < 0.5 ? 'word' : 'color';
-
-    questionBox.style.background = '#fff';
-    questionBox.style.color = 'var(--ink)';
-
-    if(type === 'word'){
-      qText.style.display='block';
-      qColor.style.display='none';
-      qText.textContent = current.name;
-
-      const opts = makeOptions(current, 3).map(o => o.hex);
-      renderOptionsColor(leftAnswers, opts, 'p1');
-      renderOptionsColor(rightAnswers, shuffle(opts), 'p2');
-    }else{
-      qText.style.display='none';
-      qColor.style.display='block';
-      questionBox.style.background = current.hex;
-      if (current.hex === '#000000') questionBox.style.color = '#fff';
-
-      const opts = makeOptions(current, 3).map(o => o.name);
-      renderOptionsWords(leftAnswers, opts, 'p1');
-      renderOptionsWords(rightAnswers, shuffle(opts), 'p2');
-    }
-
-    startTimer(QUESTION_TIME, ()=>advanceAfterTimeout());
-    roundIndex++;
-  }
-
-  function makeOptions(target, nDistr){
-    const others = shuffle(COLORS.filter(c=>c!==target)).slice(0, nDistr);
-    return shuffle([target, ...others]);
-  }
-
-  function renderOptionsColor(root, options, player){
-    root.innerHTML = '';
-    options.forEach(hex=>{
-      const btn = document.createElement('button');
-      btn.className = 'ans color';
-      btn.style.background = hex;
-      btn.setAttribute('data-value', hex);
-      btn.onclick = ()=>handleAnswer(player, hex);
-      root.appendChild(btn);
-    });
-  }
-
-  function renderOptionsWords(root, options, player){
-    root.innerHTML = '';
-    options.forEach(name=>{
-      const btn = document.createElement('button');
-      btn.className = 'ans';
-      btn.textContent = name;
-      btn.setAttribute('data-value', name);
-      btn.onclick = ()=>handleAnswer(player, name);
-      root.appendChild(btn);
-    });
-  }
-
-  function handleAnswer(player, value){
-    if(!acceptingAnswers || answered[player]) return;
-
-    const isCorrect = (type === 'word')
-      ? (value.toLowerCase() === current.hex.toLowerCase())
-      : (value === current.name);
-
-    answered[player] = true;
-
-    const root = (player==='p1') ? leftAnswers : rightAnswers;
-    const btn = [...root.children].find(b => b.getAttribute('data-value') === value);
-    choices[player] = { element: btn, correct: isCorrect, animationElement: null };
-    btn.classList.add('selected');
-
-    if(isCorrect){
-      if(firstCorrectBy === null){
-        firstCorrectBy = player;
-        addPoints(player, 10);
-      }else if(firstCorrectBy !== player){
-        addPoints(player, 5);
-      }
-    }
-
-    [...root.children].forEach(b=>b.classList.add('disabled'));
-
-    if(answered.p1 && answered.p2){
-      clearTimer();
-      setTimeout(revealResults, 350);
-    }
-  }
-
-  function revealResults() {
-    acceptingAnswers = false;
-    for(const player of ['p1', 'p2']) {
-      if(choices[player]) {
-        choices[player].element.classList.remove('selected');
-        choices[player].element.classList.add(choices[player].correct ? 'correct' : 'wrong');
-        if(choices[player].correct && choices[player].animationElement) {
-          document.body.appendChild(choices[player].animationElement);
+    // --- DATA MODULE ---
+    const Data = {
+        colors: {
+            title: "Seviye 1: Renkler",
+            words: {
+                unit1: {
+                    title: { tr: "Ünite 1" }, description: { tr: "Temel Renkler" },
+                    lessons: {
+                        lesson1: {
+                            description: { tr: "Renkler Testi" },
+                            words: [
+                                { id: 1, arabic: 'أَحْمَر', turkish: 'Kırmızı', cssColor: '#E74C3C' },
+                                { id: 2, arabic: 'أَزْرَق', turkish: 'Mavi', cssColor: '#3498DB' },
+                                { id: 3, arabic: 'أَصْفَر', turkish: 'Sarı', cssColor: '#F1C40F' },
+                                { id: 4, arabic: 'أَخْضَر', turkish: 'Yeşil', cssColor: '#2ECC71' },
+                                { id: 5, arabic: 'بُنِّيّ', turkish: 'Kahverengi', cssColor: '#A0522D' },
+                                { id: 6, arabic: 'وَرْدِيّ', turkish: 'Pembe', cssColor: '#FFC0CB' },
+                                { id: 7, arabic: 'بُرتُقَالِيّ', turkish: 'Turuncu', cssColor: '#E67E22' },
+                                { id: 8, arabic: 'بَنَفْسَجِيّ', turkish: 'Mor', cssColor: '#8E44AD' }, // Yazım düzeltildi
+                                { id: 9, arabic: 'أَبْيَض', turkish: 'Beyaz', cssColor: '#FFFFFF' }, // Daha canlı beyaz
+                                { id: 10, arabic: 'أَسْوَد', turkish: 'Siyah', cssColor: '#000000' }  // Daha canlı siyah
+                            ]
+                        }
+                    }
+                }
+            }
         }
-      }
-    }
-    setTimeout(nextRound, 1400);
-  }
+    };
+    // --- DATA MODULE SONU ---
 
-  function addPoints(player, pts){
-    scores[player] += pts;
-    const el = (player==='p1') ? p1ScoreEl : p2ScoreEl;
-    el.textContent = scores[player];
+    // --- UTILS MODULE ---
+    const Utils = { shuffleArray: (arr) => [...arr].sort(() => 0.5 - Math.random()) };
 
-    const anim = document.createElement('div');
-    anim.className = 'point-animation';
-    anim.textContent = `+${pts}`;
+    // --- APP MODULE ---
+    const App = {
+        state: { selectedPlayers: null, selectedLessonId: null, isAudioInitialized: false, audioCtx: null, theOnlyLessonId: 'colors-unit1-lesson1' },
+        dom: { screens: document.querySelectorAll('.screen'), startScreen: document.getElementById('start-screen'), gameScreen: document.getElementById('quiz-screen'), resultsScreen: document.getElementById('results-screen'), playerSelect: document.getElementById('player-select'), startGameBtn: document.getElementById('start-game-btn'), },
+        init() { this.initStartScreenListeners(); QuizGame.init(); this.showScreen('start-screen'); },
+        showScreen(screenId) { this.dom.screens.forEach(s => s.classList.remove('active')); const tS = document.getElementById(screenId); if (tS) { tS.classList.add('active'); tS.scrollTop = 0; } if (screenId === 'start-screen') { this.state.selectedPlayers = null; this.state.selectedLessonId = null; this.updateSelection(this.dom.playerSelect, null); this.checkStartButtonState(); } },
+        initAudio() { if(this.state.audioCtx&&this.state.audioCtx.state==='running'){this.state.isAudioInitialized=true;return Promise.resolve();}if(this.state.isAudioInitialized&&this.state.audioCtx&&this.state.audioCtx.state==='suspended'){return this.state.audioCtx.resume();}this.state.isAudioInitialized=true;try{if(!this.state.audioCtx){this.state.audioCtx=new(window.AudioContext||window.webkitAudioContext)();}if(this.state.audioCtx.state==='suspended'){return this.state.audioCtx.resume();}else{return Promise.resolve();}}catch(e){console.error("Web Audio API desteklenmiyor.");this.state.isAudioInitialized=false;return Promise.reject(e);} },
+        playSound(key) { if(!this.state.isAudioInitialized||!this.state.audioCtx||this.state.audioCtx.state!=='running'){return;}const sounds={menuClick:{f:600,t:'square',d:0.08},touch:{f:300,t:'sine',d:0.05},correct:{f:523.25,t:'sine',d:0.2},incorrect:{f:164.81,t:'square',d:0.2},countdown:{f:880,t:'sine',d:0.15}};const s=sounds[key];if(!s)return;const g=this.state.audioCtx.createGain();g.connect(this.state.audioCtx.destination);g.gain.setValueAtTime(0,this.state.audioCtx.currentTime);g.gain.linearRampToValueAtTime(0.1,this.state.audioCtx.currentTime+0.01);g.gain.linearRampToValueAtTime(0,this.state.audioCtx.currentTime+s.d);const o=this.state.audioCtx.createOscillator();o.type=s.t;o.frequency.value=s.f;o.connect(g);o.start(0);o.stop(this.state.audioCtx.currentTime+s.d); },
+        initStartScreenListeners() {
+            this.dom.playerSelect.addEventListener('click', async e => { const btn=e.target.closest('.player-button'); if(!btn)return; try{await this.initAudio();}catch(err){console.warn("Ses başlatılamadı.");} this.playSound('touch'); this.state.selectedPlayers=parseInt(btn.dataset.players,10); this.updateSelection(this.dom.playerSelect,btn); this.state.selectedLessonId=this.state.theOnlyLessonId; this.checkStartButtonState(); });
+            this.dom.startGameBtn.onclick=async()=>{ try{await this.initAudio();}catch(e){console.error("Ses başlatılamadı:",e);} this.playSound('menuClick'); const{selectedPlayers,selectedLessonId}=this.state; if(!selectedPlayers||!selectedLessonId){console.error("HATA: Oyuncu/Ders seçilmedi!");this.checkStartButtonState();return;} const words=this.getWords(selectedLessonId); let wordsForGame; if(selectedPlayers===1){if(!words||words.length<4){alert(`Yeterli (en az 4) kelime yok.`);return;} wordsForGame=Utils.shuffleArray(words);}else{const qC=5;if(!words||words.length<10){alert(`2P için yeterli (en az 10) kelime yok. (Mevcut: ${words.length})`);return;} wordsForGame=Utils.shuffleArray(words).slice(0,qC);} if(wordsForGame.length===0){alert("Kelime bulunamadı.");return;} QuizGame.start(wordsForGame,selectedPlayers); this.showScreen('quiz-screen'); };
+        },
+        updateSelection(cont,selBtn){cont?.querySelectorAll('.selected').forEach(b=>b.classList.remove('selected'));selBtn?.classList.add('selected');},
+        checkStartButtonState(){const isDisabled=!(this.state.selectedPlayers&&this.state.selectedLessonId);if(this.dom.startGameBtn){this.dom.startGameBtn.disabled=isDisabled;}else{console.error("Başla butonu bulunamadı!");}},
+        loadProgress(){/*Gerek yok*/}, saveProgress(){/*Gerek yok*/}, getAllLessonIdsOrdered(){return[this.state.theOnlyLessonId];}, unlockNextLesson(id){return false;}, populateLessonSelector(){/*Gerek yok*/},
+        getWords(id){if(!id)return[];try{const p=id.split('-');const g=p[0];const u=p[1];const l=p[2];return Data[g]?.words[u]?.lessons[l]?.words||[];}catch(e){console.error("Kelime alınırken hata:",e);return[];}},
+        getAllWords(){if(Data.colors&&Data.colors.words){return Object.values(Data.colors.words).flatMap(u=>Object.values(u.lessons).flatMap(l=>l.words||[]));}return[];},
+        initNavigation(){/*Gerek yok*/},
+        showResults(data){const rS=document.getElementById('results-screen');let h=`<div class="header-navigation"><button class="back-btn" title="Ana Menü"><svg viewBox="0 0 24 24"><path d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z"></path></svg></button></div>`;const iS=`<svg viewBox="0 0 24 24"><path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" /></svg>`;if(data.playerMode===1){const fS=Math.round(data.score);let sC=0;if(fS>=85){sC=3;}else if(fS>50){sC=2;}else if(fS===50){sC=1;}const gSH=(c,s="clamp(40px, 8vw, 60px)")=>{const svg=`<svg viewBox="0 0 24 24" style="width:${s};height:${s};" fill="%s"><path d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path></svg>`;const f=svg.replace('%s','var(--accent-color)');const e=svg.replace('%s','#eceff4');let h='';for(let i=0;i<3;i++){h+=(i<c)?f:e;}return `<div id="quiz-winner-icon-container" class="star-rating">${h}</div>`;};let t='';let m='';const sz=(sC===3)?"clamp(60px,12vw,90px)":"clamp(40px,8vw,60px)";const sH=gSH(sC,sz);if(sC===3){t="Mükemmel!";m=`<p class="unlocked-message">Tebrikler! Mükemmel bir iş çıkardın!</p>`;}else if(sC===2){t="İyi İş!";m=`<p>Biraz daha gayretle 3 yıldıza ulaşabilirsin!</p>`;}else if(sC===1){t="Fena Değil!";m=`<p>Tekrar deneyerek puanını yükseltebilirsin.</p>`;}else{t="Tekrar Deneyin!";m=`<p>Daha iyi bir sonuç için tekrar oyna.</p>`;}h+=` <h2 id="quiz-win-text">${t}</h2> ${sH} <h3>Skor: ${fS} Puan</h3> ${m} <div class="win-buttons"> <button class="icon-btn" id="play-again-btn" title="Tekrar Oyna"><svg viewBox="0 0 24 24"><path d="M17.65,6.35C16.2,4.9 14.21,4 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C15.73,20 18.84,17.45 19.73,14H17.65C16.83,16.33 14.61,18 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6C13.66,6 15.14,6.69 16.22,7.78L13,11H20V4L17.65,6.35Z"></path></svg></button> <button class="icon-btn" id="back-to-start-btn" title="Ana Menü"><svg viewBox="0 0 24 24"><path d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z"></path></svg></button> </div>`;rS.innerHTML=h;rS.querySelector('.back-btn').onclick=()=>{App.playSound('menuClick');App.showScreen('start-screen');};rS.querySelector('#play-again-btn').onclick=async()=>{await App.initAudio();App.playSound('menuClick');const w=App.getWords(App.state.selectedLessonId);if(!w||w.length<4){App.showScreen('start-screen');return;}QuizGame.start(Utils.shuffleArray(w),1);App.showScreen('quiz-screen');};rS.querySelector('#back-to-start-btn').onclick=()=>{App.playSound('menuClick');App.showScreen('start-screen');};}else{let txt,wCls,iHtml='';if(data.winner===1){txt='1. Oyuncu Kazandı!';wCls='p1-win';iHtml=iS;}else if(data.winner===2){txt='2. Oyuncu Kazandı!';wCls='p2-win';iHtml=iS;}else{txt='Berabere!';wCls='draw';iHtml=iS+iS;}h+=` <div id="quiz-winner-icon-container" class="${wCls}">${iHtml}</div> <h2 id="quiz-win-text" class="${wCls}">${txt}</h2> <h3>Skor: ${data.score1} - ${data.score2}</h3> <div class="win-buttons"> <button class="icon-btn" id="play-again-btn" title="Tekrar Oyna"><svg viewBox="0 0 24 24"><path d="M17.65,6.35C16.2,4.9 14.21,4 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C15.73,20 18.84,17.45 19.73,14H17.65C16.83,16.33 14.61,18 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6C13.66,6 15.14,6.69 16.22,7.78L13,11H20V4L17.65,6.35Z"></path></svg></button> <button class="icon-btn" id="back-to-start-btn" title="Ana Menü"><svg viewBox="0 0 24 24"><path d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z"></path></svg></button> </div>`;rS.innerHTML=h;rS.querySelector('.back-btn').onclick=()=>{App.playSound('menuClick');App.showScreen('start-screen');};rS.querySelector('#play-again-btn').onclick=async()=>{await App.initAudio();App.playSound('menuClick');const w=App.getWords(App.state.selectedLessonId);const qC=5;if(!w||w.length<10){App.showScreen('start-screen');return;}QuizGame.start(Utils.shuffleArray(w).slice(0,qC),2);App.showScreen('quiz-screen');};rS.querySelector('#back-to-start-btn').onclick=()=>{App.playSound('menuClick');App.showScreen('start-screen');};}this.showScreen('results-screen');}
+    };
 
-    const rect = choices[player].element.getBoundingClientRect();
-    anim.style.left = `${rect.left + rect.width / 2}px`;
-    anim.style.top = `${rect.top + rect.height / 2}px`;
-    anim.addEventListener('animationend', () => anim.remove());
-    choices[player].animationElement = anim;
-  }
+    // --- QUIZ GAME MODULE ---
+    const QuizGame = {
+        screenId: 'quiz-screen',
+        state: { allColorObjects: [], pointsPerQuestion: 0, currentQuestionType: 'textToColor', p1Questions: [], p1Index: 0, p1Score: 0, p1Finished: false, p2Questions: [], p2Index: 0, p2Score: 0, p2Finished: false, playerMode: 1, questionsPerRound: 0, answerLog: {}, p1StartTime: 0, p2StartTime: 0, p1Timeout: null, p2Timeout: null },
+        dom: { p1: {}, p2: {}, countdownOverlay: null },
+        init() { 
+            this.state.allColorObjects = App.getAllWords();
+            // allWordsPool kaldırıldı
+        },
+        start(questions, playerMode) { /* ... (start kodu değişmedi) ... */ this.stop(); this.state.playerMode = playerMode; this.state.questionsPerRound = questions.length; this.state.p1Questions = Utils.shuffleArray([...questions]); this.state.p1Index = 0; this.state.p1Score = 0; this.state.p1Finished = false; this.state.answerLog = {}; if (playerMode === 1) { this.state.pointsPerQuestion = 100 / this.state.questionsPerRound; } else { this.state.pointsPerQuestion = 0; } let p2_html = ''; if (playerMode === 2) { const allW = this.state.allColorObjects; const remW = allW.filter(w => !this.state.p1Questions.some(p1w => p1w.id === w.id)); if (remW.length >= this.state.questionsPerRound) { this.state.p2Questions = Utils.shuffleArray(remW).slice(0, this.state.questionsPerRound); } else { let pQs=Utils.shuffleArray([...this.state.p1Questions]); let c=true; while(c){c=false; for(let i=0;i<pQs.length;i++){if(pQs[i].id===this.state.p1Questions[i].id){c=true; const n=(i+1)%pQs.length; [pQs[i],pQs[n]]=[pQs[n],pQs[i]];}}} if(pQs.length>1&&pQs.every((q,i)=>q.id===this.state.p1Questions[i].id)){pQs=Utils.shuffleArray([...pQs]);} this.state.p2Questions=pQs; } this.state.p2Index = 0; this.state.p2Score = 0; this.state.p2Finished = false; p2_html = ` <div class="quiz-player-area p2"><div class="score-effects-container"></div><div class="quiz-game-content hidden"><div class="quiz-top-bar"><div class="quiz-progress" id="quiz-progress-p2"></div><div class="progress-bar" id="quiz-progress-bar-p2"></div></div><div class="quiz-question" id="quiz-question-p2">...</div><div class="quiz-options" id="quiz-options-p2"></div></div></div>`; } const qS = document.getElementById('quiz-screen'); qS.className = "screen active"; qS.classList.add(playerMode === 1 ? 'single-player-mode' : 'two-player-mode'); qS.innerHTML = ` <div class="countdown-overlay" id="quiz-countdown-overlay"></div> <div class="header-navigation"><button class="back-btn" title="Ana Menü"><svg viewBox="0 0 24 24"><path d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z"></path></svg></button></div> <div id="quiz-container"> <div class="quiz-player-area p1"> <div class="score-effects-container"></div> <div class="quiz-game-content hidden"> <div class="quiz-top-bar"> <div class="quiz-progress" id="quiz-progress-p1"></div> <div class="progress-bar" id="quiz-progress-bar-p1"></div> </div> <div class="quiz-question" id="quiz-question-p1">...</div> <div class="quiz-options" id="quiz-options-p1"></div> </div> </div> ${p2_html} </div>`; this.dom.p1 = { area: qS.querySelector('.quiz-player-area.p1'), progress: document.getElementById('quiz-progress-p1'), progressBar: document.getElementById('quiz-progress-bar-p1'), question: document.getElementById('quiz-question-p1'), options: document.getElementById('quiz-options-p1'), content: qS.querySelector('.quiz-player-area.p1 .quiz-game-content'), effectsContainer: qS.querySelector('.quiz-player-area.p1 .score-effects-container'), }; if (playerMode === 2) { this.dom.p2 = { area: qS.querySelector('.quiz-player-area.p2'), progress: document.getElementById('quiz-progress-p2'), progressBar: document.getElementById('quiz-progress-bar-p2'), question: document.getElementById('quiz-question-p2'), options: document.getElementById('quiz-options-p2'), content: qS.querySelector('.quiz-player-area.p2 .quiz-game-content'), effectsContainer: qS.querySelector('.quiz-player-area.p2 .score-effects-container'), }; this.createProgressBar(2); } else { this.dom.p2 = {}; } this.dom.countdownOverlay = document.getElementById('quiz-countdown-overlay'); qS.querySelector('.back-btn').onclick = () => { App.playSound('menuClick'); App.showScreen('start-screen'); this.stop(); }; if (this.state.playerMode === 1) { this.startGameLoop(); } else { this.startCountdown(); } this.createProgressBar(1); },
+        stop() { if (this.state.p1Timeout) clearTimeout(this.state.p1Timeout); this.state.p1Timeout = null; if (this.state.p2Timeout) clearTimeout(this.state.p2Timeout); this.state.p2Timeout = null; },
+        startCountdown() { if(!this.dom.countdownOverlay) return; this.dom.countdownOverlay.style.display = 'flex'; let c = 3; this.dom.countdownOverlay.textContent = c; App.playSound('countdown'); const cI = setInterval(() => { c--; if (c > 0) { if(this.dom.countdownOverlay) this.dom.countdownOverlay.textContent = c; App.playSound('countdown'); } else { clearInterval(cI); if(this.dom.countdownOverlay) this.dom.countdownOverlay.style.display = 'none'; this.startGameLoop(); } }, 1000); },
+        startGameLoop() { if(this.dom.p1.content) this.dom.p1.content.classList.remove('hidden'); this.showQuestion(1); if (this.state.playerMode === 2 && this.dom.p2.content) { this.dom.p2.content.classList.remove('hidden'); this.showQuestion(2); } },
+        createProgressBar(pN) { const pD = (pN === 1) ? this.dom.p1 : this.dom.p2; if(!pD || !pD.progressBar) return; pD.progressBar.innerHTML = ''; for (let i = 0; i < this.state.questionsPerRound; i++) { const s = document.createElement('div'); s.className = 'progress-segment'; pD.progressBar.appendChild(s); } },
+        
+        showQuestion(playerNum) {
+            const pS = (playerNum === 1) ? { q: this.state.p1Questions, i: this.state.p1Index, s: this.state.p1Score } : { q: this.state.p2Questions, i: this.state.p2Index, s: this.state.p2Score };
+            const pD = (playerNum === 1) ? this.dom.p1 : this.dom.p2;
+            if(!pD || !pD.question) return;
 
-  function startTimer(durationMs, onEnd){
-    const start = performance.now();
-    function frame(now){
-      const elapsed = now - start;
-      const remain = Math.max(0, durationMs - elapsed);
-      const remainingPct = remain / durationMs;
+            if (pS.i >= pS.q.length) { /* Bitiş */ if(playerNum===1)this.state.p1Finished=true;else this.state.p2Finished=true; pD.question.textContent='Bitti!';pD.options.innerHTML=''; const sI=`<svg viewBox="0 0 24 24"><path d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z" /></svg>`; let dS; if(this.state.playerMode===1&&playerNum===1){dS=Math.round(pS.s);}else{dS=pS.s;} if(pD.progress)pD.progress.innerHTML=`<div class="quiz-score-display">${sI}<span>${dS}</span></div>`; if(this.state.playerMode===1||(this.state.p1Finished&&this.state.p2Finished)){this.endGame();} return; }
 
-      timeBar.style.width = (remainingPct * 100).toFixed(2) + '%';
-      spark.style.right = `calc(${(remainingPct * 100).toFixed(2)}% - 26px)`;
+            const word = pS.q[pS.i];
+            if(pD.options) pD.options.classList.remove('answered');
 
-      if(remain <= 0){
-        cancelAnimationFrame(timerId);
-        timerId = null;
-        onEnd?.();
-        return;
-      }
-      timerId = requestAnimationFrame(frame);
-    }
-    cancelAnimationFrame(timerId);
-    timerId = requestAnimationFrame(frame);
-  }
+            const sI = `<svg viewBox="0 0 24 24"><path d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z" /></svg>`;
+            let dS; if (this.state.playerMode === 1 && playerNum === 1) { dS = Math.round(pS.s); } else { dS = pS.s; } if(pD.progress) pD.progress.innerHTML = `<div class="quiz-score-display">${sI}<span>${dS}</span></div>`;
+            const segments = pD.progressBar?.children; if(segments) { Array.from(segments).forEach(s => s.classList.remove('active')); if(segments[pS.i]) segments[pS.i].classList.add('active'); }
 
-  function clearTimer(){
-    if(timerId){ cancelAnimationFrame(timerId); timerId=null; }
-    timeBar.style.width = '100%';
-    spark.style.right = 'calc(100% - 26px)';
-  }
+            let qT; if(this.state.playerMode === 2) { qT = this.state.answerLog[pS.i]?.questionType; if (!qT) { qT = Math.random() < 0.5 ? 'textToColor' : 'colorToText'; if (!this.state.answerLog[pS.i]) this.state.answerLog[pS.i] = {}; this.state.answerLog[pS.i].questionType = qT; } } else { qT = Math.random() < 0.5 ? 'textToColor' : 'colorToText'; } this.state.currentQuestionType = qT; 
 
-  function advanceAfterTimeout(){
-    acceptingAnswers = false;
-    revealResults();
-  }
+            let oC = 4; const wAC = oC - 1;
+            if(pD.options) { pD.options.innerHTML = ''; pD.options.classList.remove('five-options', 'four-options'); if (oC === 4) { pD.options.classList.add('four-options'); } }
+            
+            if (qT === 'textToColor') { // Soru Yazı (Arapça) -> Cevap Renk
+                pD.question.textContent = word.arabic; pD.question.style.backgroundColor = 'var(--surface-color)'; pD.question.classList.remove('color-question');
+                const wOs = Utils.shuffleArray(this.state.allColorObjects.filter(c => c.id !== word.id)).slice(0, wAC); const opts = Utils.shuffleArray([word, ...wOs]);
+                opts.forEach((cO) => { const btn = document.createElement('button'); btn.className = 'quiz-option-btn color-swatch'; btn.textContent = cO.arabic; btn.style.backgroundColor = cO.cssColor; btn.dataset.colorId = cO.id; if (cO.cssColor === '#FFFFFF') { btn.classList.add('white-swatch'); } btn.onclick = (e) => this.checkAnswer(e.currentTarget, word.id, playerNum, qT); if(pD.options) pD.options.appendChild(btn); });
+            } else { // Soru Renk -> Cevap Yazı (Arapça)
+                pD.question.textContent = ''; pD.question.style.backgroundColor = word.cssColor; pD.question.classList.add('color-question');
+                
+                // Yanlış cevapları Arapça kelimelerden seç
+                const wrongAnswersObjs = Utils.shuffleArray(this.state.allColorObjects.filter(c => c.id !== word.id)).slice(0, wAC);
+                const optionsObjs = Utils.shuffleArray([word, ...wrongAnswersObjs]);
+                
+                optionsObjs.forEach((obj) => { 
+                    const btn = document.createElement('button'); 
+                    btn.className = 'quiz-option-btn'; 
+                    btn.textContent = obj.arabic; // Seçenek metni Arapça
+                    btn.onclick = (e) => this.checkAnswer(e.currentTarget, word.arabic, playerNum, qT); // Doğru cevap da Arapça
+                    if(pD.options) pD.options.appendChild(btn); 
+                });
+            }
+            if(playerNum === 1) this.state.p1StartTime = Date.now(); else this.state.p2StartTime = Date.now();
+        },
 
-  function finishGame(){
-    show('result');
-    rankBox.innerHTML = '';
-    const order = [
-      { id:'1', key:'p1', score:scores.p1 },
-      { id:'2', key:'p2', score:scores.p2 },
-    ].sort((a,b)=>b.score-a.score);
+        _createFeedbackIcon(isCorrect) {
+            const iconDiv = document.createElement('div');
+            iconDiv.className = 'feedback-icon ' + (isCorrect ? 'tick-icon' : 'cross-icon');
+            const svgNS = "http://www.w3.org/2000/svg";
+            const svg = document.createElementNS(svgNS, "svg");
+            svg.setAttribute("viewBox", "0 0 24 24");
+            const path = document.createElementNS(svgNS, "path");
+            if (isCorrect) { path.setAttribute("d", "M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"); } 
+            else { path.setAttribute("d", "M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"); }
+            svg.appendChild(path); iconDiv.appendChild(svg);
+            return iconDiv;
+        },
 
-    order.forEach((p)=>{
-      const row = document.createElement('div');
-      row.className='row';
-      const pill = document.createElement('div');
-      pill.className='player-pill';
-      pill.innerHTML = `<span>اللاعب ${p.id}</span> <span aria-hidden="true">👤</span> <span class="score-chip">${p.score}</span>`;
-      row.appendChild(pill);
-      rankBox.appendChild(row);
+        checkAnswer(button, correctAnswer, playerNum, questionType) {
+            const type = (this.state.playerMode === 1) ? this.state.currentQuestionType : questionType; App.playSound('touch');
+            const tT = (playerNum === 1) ? (Date.now() - this.state.p1StartTime) : (Date.now() - this.state.p2StartTime); const pD = (playerNum === 1) ? this.dom.p1 : this.dom.p2; const pI = (playerNum === 1) ? this.state.p1Index : this.state.p2Index; if(!pD || !pD.options) return;
+            Array.from(pD.options.children).forEach(btn => { btn.disabled = true; }); button.classList.add('selected');
+
+            let isCorrect = (type === 'textToColor') ? (parseInt(button.dataset.colorId, 10) === correctAnswer) : (button.textContent.trim() === correctAnswer); 
+
+            const feedbackIcon = this._createFeedbackIcon(isCorrect);
+            button.appendChild(feedbackIcon); 
+            setTimeout(() => { if (feedbackIcon.parentNode) feedbackIcon.remove(); }, 1400); // Güvenlik kontrolü eklendi
+
+            if (this.state.playerMode === 1) {
+                if (isCorrect) { App.playSound('correct'); this.state.p1Score += this.state.pointsPerQuestion; this.showScoreEffect(1, Math.round(this.state.pointsPerQuestion)); } 
+                else { 
+                    App.playSound('incorrect'); 
+                    Array.from(pD.options.children).forEach(btn => { 
+                        let isBtnCorrect = (type === 'textToColor') ? (parseInt(btn.dataset.colorId, 10) === correctAnswer) : (btn.textContent.trim() === correctAnswer);
+                        if(isBtnCorrect && btn !== button) { 
+                            const correctIcon = this._createFeedbackIcon(true);
+                            btn.appendChild(correctIcon);
+                            setTimeout(() => { if (correctIcon.parentNode) correctIcon.remove(); }, 1400); // Güvenlik kontrolü
+                        }
+                    });
+                }
+                const s = pD.progressBar?.children; if(s?.[pI]) s[pI].classList.add(isCorrect ? 'correct' : 'incorrect'); 
+                this.updateScoreDisplay(1); if(s?.[pI]) s[pI].classList.remove('active');
+                this.state.p1Timeout = setTimeout(() => { this.state.p1Index++; this.showQuestion(1); }, 1500);
+            
+            } else { if (!this.state.answerLog[pI]) { this.state.answerLog[pI] = {}; } this.state.answerLog[pI].questionType = type; this.state.answerLog[pI][playerNum] = { isCorrect, timeTaken: tT, button }; if (this.state.answerLog[pI]?.[1] && this.state.answerLog[pI]?.[2]) { this.processRoundResults(pI); } }
+        },
+        
+        processRoundResults(roundIndex) {
+            const p1A=this.state.answerLog[roundIndex]?.[1]; const p2A=this.state.answerLog[roundIndex]?.[2]; const p1D=this.dom.p1; const p2D=this.dom.p2; const type=this.state.answerLog[roundIndex]?.questionType; if(!p1A||!p2A||!p1D||!p2D||!type)return;
+            p1A.button.classList.remove('selected'); p2A.button.classList.remove('selected');
+            const p1W=this.state.p1Questions[roundIndex]; const p2W=this.state.p2Questions[roundIndex];
+            
+            // Doğru cevapları gösterme (checkAnswer zaten yapıyor)
+            if(p1D.options) p1D.options.classList.add('answered'); if(p2D.options) p2D.options.classList.add('answered');
+            
+            if(p1A.isCorrect){this.state.p1Score+=10;this.showScoreEffect(1,10);} if(p2A.isCorrect){this.state.p2Score+=10;this.showScoreEffect(2,10);} let bW=0; if(p1A.isCorrect&&p2A.isCorrect){if(p1A.timeTaken<p2A.timeTaken)bW=1;else if(p2A.timeTaken<p1A.timeTaken)bW=2;}else if(p1A.isCorrect)bW=1;else if(p2A.isCorrect)bW=2; if(bW===1){this.state.p1Score+=10;setTimeout(()=>this.showScoreEffect(1,10,true),400);}else if(bW===2){this.state.p2Score+=10;setTimeout(()=>this.showScoreEffect(2,10,true),400);} if(p1A.isCorrect||p2A.isCorrect)App.playSound('correct'); if(!p1A.isCorrect||!p2A.isCorrect)App.playSound('incorrect');
+            const p1S=p1D.progressBar?.children; const p2S=p2D.progressBar?.children; if(p1S?.[roundIndex])p1S[roundIndex].classList.add(p1A.isCorrect?'correct':'incorrect'); if(p2S?.[roundIndex])p2S[roundIndex].classList.add(p2A.isCorrect?'correct':'incorrect'); this.updateScoreDisplay(1); this.updateScoreDisplay(2); if(p1S?.[roundIndex])p1S[roundIndex].classList.remove('active'); if(p2S?.[roundIndex])p2S[roundIndex].classList.remove('active');
+            this.state.p1Timeout=setTimeout(()=>{this.state.p1Index++;this.state.p2Index++;this.showQuestion(1);this.showQuestion(2);},2000);
+        },
+        showScoreEffect(pN, pts, isB = false) { const cont=(pN===1)?this.dom.p1?.effectsContainer:this.dom.p2?.effectsContainer;if(!cont)return;const el=document.createElement('div');el.className='score-effect';if(isB){el.classList.add('bonus');const lSVG=`<svg viewBox="0 0 24 24"><path d="M7,2V13H10V22L17,10H13L17,2H7Z" /></svg>`;el.innerHTML=`${lSVG} +${pts}`;el.style.backgroundColor='var(--accent-color)';const bC=document.createElement('div');bC.className='burst-container';for(let i=0;i<12;i++){const p=document.createElement('div');p.className='particle';const a=(i/12)*360;p.style.setProperty('--angle',a+'deg');bC.appendChild(p);}el.appendChild(bC);}else{el.innerHTML=`+${pts}`;el.style.backgroundColor='var(--correct-color)';}cont.appendChild(el);setTimeout(()=>{el.remove();},1950); },
+        updateScoreDisplay(pN) { const pD=(pN===1)?this.dom.p1:this.dom.p2;if(!pD||!pD.progress)return;const score=(pN===1)?this.state.p1Score:this.state.p2Score;let dS;if(this.state.playerMode===1&&pN===1){dS=Math.round(score);}else{dS=score;}const sI=`<svg viewBox="0 0 24 24"><path d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z" /></svg>`;pD.progress.innerHTML=`<div class="quiz-score-display">${sI}<span>${dS}</span></div>`; },
+        endGame() { if(this.state.playerMode===1){const fS=this.state.p1Score;const iW=fS>=85;App.showResults({playerMode:1,score:fS,totalQuestions:this.state.questionsPerRound,isWin:iW,nextLessonUnlocked:false});}else{let w=0;if(this.state.p1Score>this.state.p2Score)w=1;else if(this.state.p2Score>this.state.p1Score)w=2;App.showResults({playerMode:2,score1:this.state.p1Score,score2:this.state.p2Score,totalQuestions:this.state.questionsPerRound,winner:w});} }
+    };
+
+    App.init();
+
     });
-  }
-
-  document.getElementById('start-btn').addEventListener('click', ()=>{
-    show('game');
-    leftAnswers.innerHTML = rightAnswers.innerHTML = '';
-    qText.textContent=''; qColor.style.background='transparent';
-    startCountdownThenGame();
-  });
-
-  document.getElementById('play-again').addEventListener('click', ()=>{
-    show('game');
-    startCountdownThenGame();
-  });
-
-  document.getElementById('back-home').addEventListener('click', ()=>{
-    clearTimer();
-    show('start');
-  });
-
-  document.addEventListener('keydown', e=>{
-    if(e.key==='Escape' && screens.game.classList.contains('active')){
-      document.getElementById('back-home').click();
-    }
-  });
 </script>
 </body>
 </html>
